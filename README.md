@@ -72,35 +72,40 @@ The main goals are:
 | `validation.py` | Input and share validation |
 | `models.py` | Data structures for representing shares |
 
+
+
 ## Mathematical Background
 
 For a threshold scheme requiring three shares, the secret is embedded in a polynomial:
 
-\[
-f(x) = s + a_1x + a_2x^2 \pmod q
-\]
+$$
+f(x) = s + a_1x + a_2x^2 \pmod{q}
+$$
 
 where:
 
-- \(s\) is the original secret.
-- \(a_1, a_2\) are randomly generated coefficients.
-- \(q\) is a prime defining the finite field.
+- $s$ is the original secret.
+- $a_1, a_2$ are randomly generated coefficients.
+- $q$ is a prime defining the finite field $\mathbb{F}_q$.
 
 Each share consists of a point:
 
-\[
-(x_i, f(x_i))
-\]
+$$
+P_i = (x_i, f(x_i))
+$$
 
-The original secret is recovered by evaluating the interpolated polynomial at \(x = 0\):
+The original secret is recovered by evaluating the interpolated polynomial at $x = 0$:
 
-\[
-s = f(0) = \sum_{i=1}^{3} y_i
-\prod_{\substack{j=1 \\ j \ne i}}^{3}
-\frac{-x_j}{x_i-x_j} \pmod q
-\]
+$$
+s = f(0) = \sum_{i=1}^{3} y_i \prod_{\substack{j=1 \\ j \ne i}}^{3} \frac{-x_j}{x_i-x_j} \pmod{q}
+$$
 
-Division in the finite field is performed using modular inverses.
+Division in the finite field is performed using modular inverses:
+
+$$
+\frac{a}{b} \pmod{q} = a \cdot b^{-1} \pmod{q}
+$$
+
 
 ## ECDSA Integration
 
