@@ -1,6 +1,6 @@
 import pytest
 
-from shamir.field import division, inverse, multiply
+from shamir.field_operations import division, inverse, multiply
 
 
 @pytest.mark.parametrize(
