@@ -1,7 +1,3 @@
-"""Działania w ciele skończonym modulo liczby pierwszej."""
-
-# TODO: Zaimplementować działania modularne, w szczególności odwrotność.
-
 def add(a, b, q):
     return (a + b) % q
 
