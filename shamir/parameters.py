@@ -1,4 +1,7 @@
-# Demonstration field modulus; the P-256 group order will be added later.
+# Demonstration field modulus.
 Q = 17
 NUMBER_OF_SHARES = 5
 POLYNOMIAL_DEGREE = 2
+
+# Order of the base point for NIST P-256 (secp256r1).
+P256_ORDER = 0xFFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAADA7179E84F3B9CAC2FC632551

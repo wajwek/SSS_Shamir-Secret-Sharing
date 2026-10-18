@@ -27,7 +27,7 @@ def test_all_share_combinations_include_all_valid_combination_sizes():
 
 def test_all_share_combinations_reconstruct_secret():
     assert all(
-        can_reconstruct_secret(points, secret=SECRET)
+        can_reconstruct_secret(list(points), secret=SECRET)
         for points in all_share_combinations()
     )
 
