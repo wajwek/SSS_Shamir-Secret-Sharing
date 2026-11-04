@@ -1,5 +1,3 @@
-"""Testy arytmetyki ciała skończonego."""
-
 import pytest
 
 from shamir.field import division, inverse, multiply
