@@ -6,16 +6,18 @@ def generate_coefficients(secret: int, degree: int, q: int) -> list[int]:
     if degree < 1:
         raise ValueError("Degree must be at least 1.")
 
-    random_coefficients = [randbelow(q) for _ in range(degree)]
+    if q < 2:
+        raise ValueError("Field modulus must be at least 2.")
+
+    leading_coefficient = randbelow(q - 1) + 1
+    random_coefficients = [leading_coefficient] + [
+        randbelow(q) for _ in range(degree - 1)
+    ]
     return [*random_coefficients, secret]
 
-# coefficients are in order from a_n (next to the x with the highest power) to a_0
-
-def evaluate_polynomial(coefficients, x, q):
+def evaluate_polynomial(coefficients: list[int], x: int, q: int) -> int:
+    """Evaluate descending coefficients [a_n, ..., a_0] using Horner's method."""
     result = 0
     for coefficient in coefficients:
         result = (result * x + coefficient) % q
     return result
-
-
-        

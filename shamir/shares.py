@@ -13,9 +13,7 @@ def generate_shares(number_of_shares: int, q: int) -> list[int]:
         x_values.add(randbelow(q - 1) + 1)
     return list(x_values)
 
-def calculate_points(arr_of_x, coefficients, q):
-    result_arr = []
-    for x in arr_of_x:
-        y = evaluate_polynomial(coefficients, x, q)
-        result_arr.append((x, y))
-    return result_arr
+def calculate_points(
+    x_values: list[int], coefficients: list[int], q: int
+) -> list[tuple[int, int]]:
+    return [(x, evaluate_polynomial(coefficients, x, q)) for x in x_values]

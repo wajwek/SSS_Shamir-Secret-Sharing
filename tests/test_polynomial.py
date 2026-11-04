@@ -4,7 +4,7 @@ from shamir.polynomial import evaluate_polynomial, generate_coefficients
 
 
 def test_generate_coefficients_keeps_secret_as_constant_term(monkeypatch):
-    generated_values = iter([3, 7])
+    generated_values = iter([2, 7])
     monkeypatch.setattr(
         "shamir.polynomial.randbelow",
         lambda q: next(generated_values),
@@ -31,3 +31,12 @@ def test_evaluate_polynomial_returns_value_modulo_q():
 
 def test_evaluate_polynomial_returns_secret_for_x_zero():
     assert evaluate_polynomial([3, 7, 5], x=0, q=17) == 5
+
+
+def test_generate_coefficients_preserves_degree_when_random_values_are_zero(monkeypatch):
+    monkeypatch.setattr("shamir.polynomial.randbelow", lambda q: 0)
+
+    coefficients = generate_coefficients(secret=5, degree=2, q=17)
+
+    assert coefficients == [1, 0, 5]
+    assert len(coefficients) == 3
