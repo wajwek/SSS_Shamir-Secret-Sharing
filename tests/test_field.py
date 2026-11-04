@@ -1,6 +1,6 @@
 import pytest
 
-from shamir.field_operations import division, inverse, multiply
+from shamir.field_operations import division, inverse
 
 
 @pytest.mark.parametrize(
@@ -33,7 +33,6 @@ def test_division_by_zero_raises_value_error():
 
 def test_division_uses_modular_inverse():
     assert division(4, 3, 7) == 6
-    assert multiply(3, division(4, 3, 7), 7) == 4
 
 
 def test_builtin_pow_raises_for_inverse_of_zero():

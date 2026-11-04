@@ -1,9 +1,3 @@
-def add(a, b, q):
-    return (a + b) % q
-
-def multiply(a, b, q):
-    return (a * b) % q
-
 def inverse(a, q):
     if a % q == 0:
         raise ValueError("Zero has no multiplicative inverse")
