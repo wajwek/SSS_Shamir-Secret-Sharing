@@ -1,139 +1,105 @@
 
 # Shamir Secret Sharing (SSS)
 
-A Python implementation of **Shamir's Secret Sharing (SSS)**, focusing on polynomial-based secret splitting and reconstruction over finite fields.
+Educational Python implementation of Shamir's Secret Sharing over a finite
+field. The configured scheme is **3-of-5**: a secret is the constant term of a
+random quadratic polynomial, five shares are generated, and any three shares
+recover the secret with Lagrange interpolation.
 
-The project explores the mathematical foundations of threshold cryptography, with a practical demonstration of splitting and recovering an ECDSA private key.
+The repository also contains an ECDSA demonstration using the NIST P-256
+curve. It reconstructs the private scalar before signing; it is **not** a
+distributed threshold-signature implementation.
 
-## Overview
+## Requirements
 
-Shamir's Secret Sharing is a cryptographic algorithm that divides a secret into multiple shares. A predefined minimum number of shares is required to reconstruct the original secret.
+- Python 3.11 or newer
+- `cryptography` for the ECDSA demonstration
+- `pytest` for the test suite
 
-This project focuses on a **(3, 5) threshold scheme**:
+## Setup
 
-- A secret is used as the constant term of a randomly generated polynomial of degree at most 2.
-- Five shares are created by evaluating the polynomial at distinct, non-zero points.
-- Any three shares can reconstruct the original secret using Lagrange interpolation.
-- Two or fewer shares are insufficient to uniquely determine the secret.
+Create and activate a virtual environment, then install the project with its
+development dependencies:
 
-All polynomial operations are performed over a finite field to ensure mathematically exact computations.
+```bash
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install -e ".[dev]"
+```
 
-## Project Goals
+On Windows PowerShell, activate the environment with
+`.venv\Scripts\Activate.ps1`.
 
-The implementation is developed from scratch to explore the underlying mathematics rather than relying on an existing SSS library.
+## Usage
 
-The main goals are:
+Run the basic secret-sharing demonstration from the repository root:
 
-1. Implement modular arithmetic, including modular inverses.
-2. Generate random polynomials over finite fields.
-3. Generate secret shares using polynomial evaluation.
-4. Implement Lagrange interpolation using basis polynomials.
-5. Reconstruct the secret from a minimum number of shares.
-6. Verify the implementation through unit tests.
-7. Integrate the algorithm with ECDSA using the NIST P-256 curve.
-8. Demonstrate signing and verifying a message with a reconstructed private key.
+```bash
+python -m demos.basic_sss
+```
 
-## Project Structure
+Run the ECDSA demonstration:
+
+```bash
+python -m demos.ecdsa_demo
+```
+
+The basic demo uses the constants from `shamir.parameters`:
+
+```python
+from shamir.lagrange import reconstruct_secret
+from shamir.parameters import Q
+from shamir.polynomial import generate_coefficients
+from shamir.shares import calculate_points, generate_shares
+
+secret = 12
+coefficients = generate_coefficients(secret, degree=2, q=Q)
+shares = calculate_points(
+    generate_shares(number_of_shares=5, q=Q),
+    coefficients,
+    q=Q,
+)
+recovered = reconstruct_secret(shares[:3], degree=2, q=Q)
+assert recovered == secret
+```
+
+Shares are `(x, y)` pairs. Their `x` coordinates must be distinct and
+non-zero. `generate_coefficients` returns coefficients in descending order,
+`[a_n, ..., a_1, a_0]`, with the secret as `a_0`.
+
+## Project layout
 
 ```text
 .
 ├── shamir/
-│   ├── __init__.py
-│   ├── parameters.py
-│   ├── field.py
-│   ├── polynomial.py
-│   ├── shares.py
-│   ├── lagrange.py
-│   ├── validation.py
-│   └── models.py
-├── tests/
-│   ├── test_field.py
-│   ├── test_polynomial.py
-│   ├── test_shares.py
-│   ├── test_lagrange.py
-│   └── test_validation.py
+│   ├── field_operations.py  # Modular inverse and division
+│   ├── lagrange.py          # Interpolation and reconstruction
+│   ├── parameters.py        # Demo and P-256 field parameters
+│   ├── polynomial.py        # Coefficient generation and evaluation
+│   ├── shares.py            # Share coordinates and point calculation
+│   └── validation.py        # Example validation helpers
 ├── demos/
-│   ├── basic_sss.py
-│   └── ecdsa_demo.py
-├── README.md
+│   ├── basic_sss.py         # 3-of-5 finite-field example
+│   └── ecdsa_demo.py        # P-256 signing example
+├── tests/
 ├── pyproject.toml
-└── .gitignore
+└── README.md
 ```
 
-### Core Modules
+## Verification
 
-| Module | Purpose |
-|--------|---------|
-| `parameters.py` | Finite field parameters and elliptic curve constants |
-| `field.py` | Modular arithmetic and modular inverses |
-| `polynomial.py` | Polynomial generation and evaluation |
-| `shares.py` | Secret splitting and share generation |
-| `lagrange.py` | Lagrange interpolation and secret reconstruction |
-| `validation.py` | Input and share validation |
-| `models.py` | Data structures for representing shares |
+Run all automated tests:
 
+```bash
+python -m pytest
+```
 
+The repository currently contains 35 tests covering modular arithmetic,
+polynomial evaluation, share generation, interpolation, reconstruction, and
+validation helpers.
 
-## Mathematical Background
+## Security notice
 
-For a threshold scheme requiring three shares, the secret is embedded in a polynomial:
-
-$$
-f(x) = s + a_1x + a_2x^2 \pmod{q}
-$$
-
-where:
-
-- $s$ is the original secret.
-- $a_1, a_2$ are randomly generated coefficients.
-- $q$ is a prime defining the finite field $\mathbb{F}_q$.
-
-Each share consists of a point:
-
-$$
-P_i = (x_i, f(x_i))
-$$
-
-The original secret is recovered by evaluating the interpolated polynomial at $x = 0$:
-
-$$
-s = f(0) = \sum_{i=1}^{3} y_i \prod_{\substack{j=1 \\ j \ne i}}^{3} \frac{-x_j}{x_i-x_j} \pmod{q}
-$$
-
-Division in the finite field is performed using modular inverses:
-
-$$
-\frac{a}{b} \pmod{q} = a \cdot b^{-1} \pmod{q}
-$$
-
-
-## ECDSA Integration
-
-The final demonstration will use the reconstructed secret as an ECDSA private key.
-
-The workflow will include:
-
-1. Generating an ECDSA private key using the P-256 curve.
-2. Splitting the private scalar into five shares.
-3. Selecting three shares to reconstruct the scalar.
-4. Recreating the corresponding ECDSA private key.
-5. Signing a test message.
-6. Verifying the signature using the original public key.
-
-The secret sharing operations will use the prime order of the P-256 base point as their finite field modulus.
-
-**Note:** This implementation reconstructs the private key before signing. It is not a distributed threshold ECDSA signing protocol.
-
-## Development
-
-The project is being implemented incrementally, with each mathematical component developed and tested separately.
-
-**Current status:** Educational development and experimentation.
-
-The code is intended for learning, testing, and demonstrating cryptographic concepts. It has not been independently audited and should not be used to protect production secrets.
-
-## Technologies
-
-- Python 3.11+
-- pytest
-- cryptography (ECDSA integration)
+This is an educational implementation and has not been independently audited.
+Do not use it to protect production secrets. In particular, the ECDSA example
+temporarily reconstructs the complete private key in one process.

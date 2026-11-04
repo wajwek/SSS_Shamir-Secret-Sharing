@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "shamir-sss-education"
 version = "0.1.0"
-description = "An Educational Implementation of Shamir's Secret Sharing with Planned Integration of ECDSA P-256"
+description = "An educational implementation of Shamir's Secret Sharing with an ECDSA P-256 demonstration"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
