@@ -1,14 +1,6 @@
 def add(a, b, q):
     return (a + b) % q
 
-def minus(a, b, q):
-    return wrap(a - b) % q
-
-def wrap(a, q):
-    while a < 0:
-        a += q
-    return a
-
 def multiply(a, b, q):
     return (a * b) % q
 
